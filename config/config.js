@@ -27,12 +27,12 @@ export default {
         },
         ...(!process.env.TEST && os.platform() === 'darwin'
           ? {
-              dll: {
-                include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
-                exclude: ['@babel/runtime'],
-              },
-              hardSource: true,
-            }
+            dll: {
+              include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
+              exclude: ['@babel/runtime'],
+            },
+            hardSource: true,
+          }
           : {}),
       },
     ],
@@ -67,6 +67,15 @@ export default {
   //     pathRewrite: { '^/server': '' },
   //   },
   // },
+
+  proxy: {
+    '/haoke/': {
+      target: 'http://127.0.0.1:18080',
+      changeOrigin: true,
+      pathRewrite: { '^/haoke/': '' },
+    },
+  },
+
   ignoreMomentLocale: true,
   lessLoaderOptions: {
     javascriptEnabled: true,

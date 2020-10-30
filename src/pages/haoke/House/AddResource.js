@@ -43,7 +43,7 @@ class AddResource extends PureComponent {
     handleSubmit = e => {
         const { dispatch, form } = this.props;
         e.preventDefault();
-      console.log(this.state.fileList);
+      // console.log(this.state.fileList);
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
 
@@ -51,13 +51,13 @@ class AddResource extends PureComponent {
                 values.facilities = values.facilities.join(",");
               }
               if(values.floor_1 && values.floor_2){
-                values.floor = values.floor_1 + "/" + values.floor_2;
+                values.floor = `${values.floor_1  }/${  values.floor_2}`;
 
               }
 
-              values.houseType = values.houseType_1 + "室" + values.houseType_2 + "厅"
-                                 + values.houseType_3 + "卫" + values.houseType_4 + "厨"
-                                 + values.houseType_2 + "阳台";
+              values.houseType = `${values.houseType_1  }室${  values.houseType_2  }厅${
+                                  values.houseType_3  }卫${  values.houseType_4  }厨${
+                                  values.houseType_2  }阳台`;
               delete values.floor_1;
               delete values.floor_2;
               delete values.houseType_1;
@@ -66,10 +66,13 @@ class AddResource extends PureComponent {
               delete values.houseType_4;
               delete values.houseType_5;
 
+              // 楼盘Id
+              values.estateId = this.state.estateId;
+
 
 
               dispatch({
-                    type: 'form/submitRegularForm',
+                    type: 'house/submitHouseForm',
                     payload: values,
                 });
             }
@@ -77,7 +80,7 @@ class AddResource extends PureComponent {
     };
 
     handleSearch = (value)=>{
-      let arr = new Array();
+      const arr = new Array();
       if(value.length > 0 ){
         estateMap.forEach((v, k) => {
           if(k.startsWith(value)){
@@ -90,12 +93,11 @@ class AddResource extends PureComponent {
       });
     } ;
 
-  handleFileList = (obj)=>{
+    handleFileList = (obj)=>{
     console.log(obj, "图片列表");
   }
 
-
-  constructor(props){
+    constructor(props){
       super(props);
       this.state = {
         estateDataSource : [],
@@ -132,44 +134,50 @@ class AddResource extends PureComponent {
 
 
         return (
-            <PageHeaderWrapper>
-                <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
-                    <Card bordered={false} title="房源信息">
-                        <FormItem {...formItemLayout} label="楼盘名称">
-                            <AutoComplete
-                              style={{ width: '100%' }}
-                              dataSource={this.state.estateDataSource}
-                              placeholder="搜索楼盘"
-                              onSelect={(value, option)=>{
-                                let v = estateMap.get(value);
+          <PageHeaderWrapper>
+            <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
+              <Card bordered={false} title="房源信息">
+                <FormItem {...formItemLayout} label="楼盘名称">
+                  <AutoComplete
+                    style={{ width: '100%' }}
+                    dataSource={this.state.estateDataSource}
+                    placeholder="搜索楼盘"
+                    onSelect={(value, option)=>{
+                                const v = estateMap.get(value);
                                 this.setState({
                                   estateAddress: v.substring(v.indexOf('|')+1),
                                   estateId : v.substring(0,v.indexOf('|'))
                                 });
                               }}
-                              onSearch={this.handleSearch}
-                              filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-                            />
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="楼盘地址">
-                          <Input
-                            prefix={<Icon type="environment" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                             value={this.state.estateAddress} defaultValue={this.state.estateAddress} readOnly/>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="楼栋">
-                            <InputGroup compact>
-                                {getFieldDecorator('buildingNum',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }}  addonAfter="栋" />)}
-                                {getFieldDecorator('buildingUnit',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }}  addonAfter="单元" />)}
-                                {getFieldDecorator('buildingFloorNum',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }}  addonAfter="门牌号" />)}
-                            </InputGroup>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="租金">
-                            <InputGroup compact>
-                              {getFieldDecorator('rent',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '50%' }} addonAfter="元/月" />)}
-                            </InputGroup>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="支付方式">
-                          {getFieldDecorator('paymentMethod',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
+                    onSearch={this.handleSearch}
+                    filterOption={(inputValue, option) => option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+                  />
+                </FormItem>
+                <FormItem {...formItemLayout} label="楼盘地址">
+                  <Input
+                    prefix={<Icon type="environment" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                    value={this.state.estateAddress}
+                    defaultValue={this.state.estateAddress}
+                    readOnly
+                  />
+                </FormItem>
+                <FormItem {...formItemLayout} label="房源标题">
+                  {getFieldDecorator('title',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '100%' }} />)}
+                </FormItem>
+                <FormItem {...formItemLayout} label="楼栋">
+                  <InputGroup compact>
+                    {getFieldDecorator('buildingNum',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }} addonAfter="栋" />)}
+                    {getFieldDecorator('buildingUnit',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }} addonAfter="单元" />)}
+                    {getFieldDecorator('buildingFloorNum',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }} addonAfter="门牌号" />)}
+                  </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="租金">
+                  <InputGroup compact>
+                    {getFieldDecorator('rent',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '50%' }} addonAfter="元/月" />)}
+                  </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="支付方式">
+                  {getFieldDecorator('paymentMethod',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
                           (
                             <Select style={{ width: '50%' }}>
                               <Option value="1">付一押一</Option>
@@ -179,44 +187,44 @@ class AddResource extends PureComponent {
                               <Option value="5">其它</Option>
                             </Select>
                           )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="租赁方式">
-                          {getFieldDecorator('rentMethod',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
+                </FormItem>
+                <FormItem {...formItemLayout} label="租赁方式">
+                  {getFieldDecorator('rentMethod',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
                           (
-                            <Select  style={{ width: '50%' }}>
+                            <Select style={{ width: '50%' }}>
                               <Option value="1">整租</Option>
                               <Option value="2">合租</Option>
                             </Select>
                           )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="户型">
-                            <InputGroup compact>
-                              {getFieldDecorator('houseType_1',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%' }} addonAfter="室" />)}
-                              {getFieldDecorator('houseType_2',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%', marginLeft: '5px' }} addonAfter="厅" />)}
-                              {getFieldDecorator('houseType_3',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%', marginLeft: '5px' }} addonAfter="卫" />)}
-                              {getFieldDecorator('houseType_4',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%', marginLeft: '5px' }} addonAfter="厨" />)}
-                              {getFieldDecorator('houseType_5',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '23%', marginLeft: '5px' }} addonAfter="阳台" />)}
-                            </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="户型">
+                  <InputGroup compact>
+                    {getFieldDecorator('houseType_1',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%' }} addonAfter="室" />)}
+                    {getFieldDecorator('houseType_2',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%', marginLeft: '5px' }} addonAfter="厅" />)}
+                    {getFieldDecorator('houseType_3',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%', marginLeft: '5px' }} addonAfter="卫" />)}
+                    {getFieldDecorator('houseType_4',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '18%', marginLeft: '5px' }} addonAfter="厨" />)}
+                    {getFieldDecorator('houseType_5',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '23%', marginLeft: '5px' }} addonAfter="阳台" />)}
+                  </InputGroup>
 
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="建筑面积">
-                            <InputGroup compact>
-                              {getFieldDecorator('coveredArea',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '40%' }} addonAfter="平米" />)}
-                            </InputGroup>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="使用面积">
-                            <InputGroup compact>
-                              {getFieldDecorator('useArea',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '40%' }} addonAfter="平米" />)}
-                            </InputGroup>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="楼层">
-                            <InputGroup compact>
-                              {getFieldDecorator('floor_1',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }} addonBefore="第" addonAfter="层" />)}
-                              {getFieldDecorator('floor_2',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%', marginLeft: '10px' }} addonBefore="总" addonAfter="层" />)}
-                            </InputGroup>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="朝向">
-                          {getFieldDecorator('orientation',{initialValue:'南',rules:[{ required: true, message:"此项为必填项" }]})
+                </FormItem>
+                <FormItem {...formItemLayout} label="建筑面积">
+                  <InputGroup compact>
+                    {getFieldDecorator('coveredArea',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '40%' }} addonAfter="平米" />)}
+                  </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="使用面积">
+                  <InputGroup compact>
+                    {getFieldDecorator('useArea',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '40%' }} addonAfter="平米" />)}
+                  </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="楼层">
+                  <InputGroup compact>
+                    {getFieldDecorator('floor_1',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%' }} addonBefore="第" addonAfter="层" />)}
+                    {getFieldDecorator('floor_2',{rules:[{ required: true, message:"此项为必填项" }]})(<Input style={{ width: '30%', marginLeft: '10px' }} addonBefore="总" addonAfter="层" />)}
+                  </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="朝向">
+                  {getFieldDecorator('orientation',{initialValue:'南',rules:[{ required: true, message:"此项为必填项" }]})
                           (
                             <Select style={{ width: '20%' }}>
                               <Option value="南">南</Option>
@@ -225,9 +233,9 @@ class AddResource extends PureComponent {
                               <Option value="西">西</Option>
                             </Select>
                           )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="装修">
-                          {getFieldDecorator('decoration',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
+                </FormItem>
+                <FormItem {...formItemLayout} label="装修">
+                  {getFieldDecorator('decoration',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
                           (
                             <Select style={{ width: '20%' }}>
                               <Option value="1">精装</Option>
@@ -235,9 +243,9 @@ class AddResource extends PureComponent {
                               <Option value="3">毛坯</Option>
                             </Select>
                           )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="配套设施">
-                          {getFieldDecorator('facilities',{initialValue:['1','2','3'],rules:[{ required: true, message:"此项为必填项" }]})
+                </FormItem>
+                <FormItem {...formItemLayout} label="配套设施">
+                  {getFieldDecorator('facilities',{initialValue:['1','2','3'],rules:[{ required: true, message:"此项为必填项" }]})
                           (
                             <CheckboxGroup options={[
                               { label: '水', value: '1' },
@@ -249,42 +257,43 @@ class AddResource extends PureComponent {
                               { label: '电梯', value: '7' },
                               { label: '车位/车库', value: '8' },
                               { label: '地下室/储藏室', value: '9' }
-                            ]}/>
+                            ]}
+                            />
                           )}
-                        </FormItem>
-                    </Card>
-                    <Card bordered={false} title="图片信息">
-                        <FormItem {...formItemLayout} label="房源描述">
-                          {getFieldDecorator('desc')
+                </FormItem>
+              </Card>
+              <Card bordered={false} title="图片信息">
+                <FormItem {...formItemLayout} label="房源描述">
+                  {getFieldDecorator('desc')
                           (
                             <TextArea placeholder="请输入备注信息" autosize={{ minRows: 4, maxRows: 10 }} />
                           )}
-                            <span>请勿填写联系方式或与房源无关信息以及图片、链接或名牌、优秀、顶级、全网首发、零距离、回报率等词汇。</span>
-                        </FormItem>
+                  <span>请勿填写联系方式或与房源无关信息以及图片、链接或名牌、优秀、顶级、全网首发、零距离、回报率等词汇。</span>
+                </FormItem>
 
-                        <FormItem {...formItemLayout} label="上传室内图">
-                            <PicturesWall handleFileList={this.handleFileList.bind(this)}/>
-                        </FormItem>
-                    </Card>
-                    <Card bordered={false} title="出租信息">
-                        <FormItem {...formItemLayout} label="联系人">
-                            <InputGroup compact>
-                              {getFieldDecorator('contact',{rules:[{ required: true, message:"此项为必填项" }]})
+                <FormItem {...formItemLayout} label="上传室内图">
+                  <PicturesWall handleFileList={this.handleFileList.bind(this)} />
+                </FormItem>
+              </Card>
+              <Card bordered={false} title="出租信息">
+                <FormItem {...formItemLayout} label="联系人">
+                  <InputGroup compact>
+                    {getFieldDecorator('contact',{rules:[{ required: true, message:"此项为必填项" }]})
                               (
                                 <Input placeholder="请输入" />
                               )}
-                            </InputGroup>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="手机号">
-                            <InputGroup compact>
-                              {getFieldDecorator('mobile',{rules:[{ required: true,max:11, message:"此项为必填项" }]})
+                  </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="手机号">
+                  <InputGroup compact>
+                    {getFieldDecorator('mobile',{rules:[{ required: true,max:11, message:"此项为必填项" }]})
                               (
                                 <Input placeholder="请输入" maxLength="11" />
                               )}
-                            </InputGroup>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="看房时间">
-                          {getFieldDecorator('time',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
+                  </InputGroup>
+                </FormItem>
+                <FormItem {...formItemLayout} label="看房时间">
+                  {getFieldDecorator('time',{initialValue:'1',rules:[{ required: true, message:"此项为必填项" }]})
                           (
                             <Select style={{ width: '20%' }}>
                               <Option value="1">上午</Option>
@@ -295,28 +304,28 @@ class AddResource extends PureComponent {
                             </Select>
                           )}
 
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="物业费">
-                          <InputGroup compact>
-                          {getFieldDecorator('propertyCost',{rules:[{ required: true,max:11, message:"此项为必填项" }]})
+                </FormItem>
+                <FormItem {...formItemLayout} label="物业费">
+                  <InputGroup compact>
+                    {getFieldDecorator('propertyCost',{rules:[{ required: true,max:11, message:"此项为必填项" }]})
                           (
-                              <Input style={{ width: '30%' }} addonAfter="元/平" />
+                            <Input style={{ width: '30%' }} addonAfter="元/平" />
                           )}
-                          </InputGroup>
+                  </InputGroup>
 
-                        </FormItem>
+                </FormItem>
 
-                        <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
-                            <Button type="primary" htmlType="submit" loading={submitting}>
-                                <FormattedMessage id="form.submit" />
-                            </Button>
-                            <Button style={{ marginLeft: 8 }}>
-                                <FormattedMessage id="form.save" />
-                            </Button>
-                        </FormItem>
-                    </Card>
-                </Form>
-            </PageHeaderWrapper >
+                <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
+                  <Button type="primary" htmlType="submit" loading={submitting}>
+                    <FormattedMessage id="form.submit" />
+                  </Button>
+                  <Button style={{ marginLeft: 8 }}>
+                    <FormattedMessage id="form.save" />
+                  </Button>
+                </FormItem>
+              </Card>
+            </Form>
+          </PageHeaderWrapper>
         );
     }
 }

@@ -18,9 +18,9 @@ export default [
     authority: ['admin', 'user'],
     routes: [
 
-      { path: '/', redirect: '/dashboard/analysis' },
+      { path: '/', redirect: '/house/resource' },
 
-      { //房源管理
+      { // 房源管理
         path: '/house',
         name: 'house',
         icon: 'home',
@@ -48,7 +48,7 @@ export default [
         ]
       },
 
-      { //房东管理
+      { // 房东管理
         path: '/fangdong',
         name: 'fangdong',
         icon: 'key',
@@ -61,7 +61,7 @@ export default [
         ]
       },
 
-      { //用户管理
+      { // 用户管理
         path: '/users',
         name: 'users',
         icon: 'user',
@@ -74,7 +74,7 @@ export default [
         ]
       },
 
-      { //合约管理
+      { // 合约管理
         path: '/heyue',
         name: 'heyue',
         icon: 'file-text',
@@ -87,7 +87,7 @@ export default [
         ]
       },
 
-      { //资讯管理
+      { // 资讯管理
         path: '/news',
         name: 'news',
         icon: 'message',
@@ -100,7 +100,7 @@ export default [
         ]
       },
 
-      { //问答管理
+      { // 问答管理
         path: '/qa',
         name: 'qa',
         icon: 'question-circle',
@@ -113,7 +113,7 @@ export default [
         ]
       },
 
-      { //财务管理
+      { // 财务管理
         path: '/finance',
         name: 'finance',
         icon: 'money-collect',
@@ -131,7 +131,7 @@ export default [
         ]
       },
 
-      { //系统管理
+      { // 系统管理
         path: '/system',
         name: 'system',
         icon: 'laptop',
